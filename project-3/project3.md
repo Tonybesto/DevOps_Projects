@@ -232,3 +232,119 @@ Todo.findOneAndDelete({"_id": req.params.id})
 module.exports = router;
 ```
 
+## Creating MongoDB Database 
+
+We will need a database to store all information when we make a post request to an endpoint. We will be using mLab which provides a DBaaS (Database as a service) solution.
+
+For this we will make use of mLab which provides MongoDB as a service solution to create a cluster. 
+
+![MongoDB cluster](./Images/Mlab%20cluster.PNG)
+
+Next, we add an IP Address choosing Anywhere
+
+**Note** this is just for practicals/test
+
+![Adding IP Address](./Images/Add%20IP%20Address.PNG)
+
+**Once IP address has been created go back to the cluster created and click on collections and select `Add my own data`**
+
+![Add my own data](./Images/Creating%20a%20DB.PNG)
+
+Create a file in your Todo directory and name it .env.
+
+
+**`touch .env`**
+
+**`vi .env`**
+
+Add the connection string to access the database in it, just as below:
+
+**`DB = 'mongodb+srv://<username>:<password>@<network-address>/<dbname>?retryWrites=true&w=majority'`**
+
+Ensure to update `<username>`, `<password>`, `<network-address>` and`<database>` according to your setup
+
+
+![Cluster connection](./Images/connect%20ip%20address.PNG)
+![Cluster connection](./Images/connection%20string.PNG)
+
+
+Now we need to update the index.js to reflect the use of .env so that Node.js can connect to the database.
+
+open the exsiting `index.js` and delete the content using `%d`, once that is done paste the code below:
+
+
+```
+const express = require('express');
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const routes = require('./routes/api');
+const path = require('path');
+require('dotenv').config();
+
+const app = express();
+
+const port = process.env.PORT || 5000;
+
+//connect to the database
+mongoose.connect(process.env.DB, { useNewUrlParser: true, useUnifiedTopology: true })
+.then(() => console.log(`Database connected successfully`))
+.catch(err => console.log(err));
+
+//since mongoose promise is depreciated, we overide it with node's promise
+mongoose.Promise = global.Promise;
+
+app.use((req, res, next) => {
+res.header("Access-Control-Allow-Origin", "\*");
+res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+next();
+});
+
+app.use(bodyParser.json());
+
+app.use('/api', routes);
+
+app.use((err, req, res, next) => {
+console.log(err);
+next();
+});
+
+app.listen(port, () => {
+console.log(`Server running on port ${port}`)
+});
+```
+
+Start your server using the command:
+
+**`node index.js`**
+
+![database sucessful](./Images/database%20connected.PNG)
+
+
+## **Testing Backend Code Using Postman**
+
+
+So far, we have built the backend of our application and in order to test to see if it works without a frontend, we use postman to test the endpoints.
+
+On Postman, we make a POST request to our database whilst specifying an action in the body of the request.
+
+
+![PostMan](./Images/install%20postman.PNG)
+
+![GET Request](./Images/GET%20request.PNG)
+
+Then We make a GET request to see if we can get back what has been posted into the database.
+
+
+![Todo](./Images/todoDB.PNG)
+
+
+so at this stage we have tested the backend operation of out todo application and can confirm that it supports all 3 operations.
+
+ - [Display a list of tasks – HTTP GET request]
+
+ - [Add a new task to the list – HTTP POST request]
+ 
+ - [Delete an existing task from the list – HTTP DELETE request]
+
+
+ ## **Creating Frontend**
