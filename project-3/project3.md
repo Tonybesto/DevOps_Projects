@@ -90,3 +90,145 @@ Install the dotenv module
 
 ![install dotenv](./Images/dotenv%20install.PNG)
 
+ 
+Open the index.js file with the command below
+
+**`vi index.js`**
+
+ 
+ Type the code below into it and save. Do not get overwhelmed by the code you see. For now, simply paste the code into the file.
+
+
+```
+const express = require('express');
+require('dotenv').config();
+
+const app = express();
+
+const port = process.env.PORT || 5000;
+
+app.use((req, res, next) => {
+res.header("Access-Control-Allow-Origin", "\*");
+res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+next();
+});
+
+app.use((req, res, next) => {
+res.send('Welcome to Express');
+});
+
+app.listen(port, () => {
+console.log(`Server running on port ${port}`)
+});
+
+```
+
+specified to use port 5000 in the code. This will be required later when we go on the browser.
+
+Use :wq to save in vim
+
+Now it is time to start our server to see if it works. Open your terminal in the same directory as your index.js file and type:
+
+**`node index.js`**
+
+![node index.js](./Images/node%20index.js)
+
+We need to open port 5000 in EC2 Security Groups, like this
+
+![inbound security](./Images/inbound%20security%20group.PNG)
+
+Open up your browser and try to access your server’s Public IP or Public DNS name followed by port 5000:
+
+
+**`http://<PublicIP-or-PublicDNS>:5000`**
+
+![Welcome To Express](./Images/welcome%20to%20Express.PNG)
+
+
+## Defining Routes For Our Applications
+
+We will create a routes folder which will contain code pointing to the three main endpoints used in a todo application. This will contain the post,get and delete requests which will be helpful in interacting with our client_side and database via restful apis.
+
+```
+mkdir routes
+
+cd routes
+
+touch api.js
+```
+
+Open the file with the command below:
+
+**`vi api.js`**
+
+Copy and paste the code below:
+
+```
+const express = require ('express');
+const router = express.Router();
+
+router.get('/todos', (req, res, next) => {
+
+});
+
+router.post('/todos', (req, res, next) => {
+
+});
+
+router.delete('/todos/:id', (req, res, next) => {
+
+})
+
+module.exports = router;
+```
+
+## Creating Models
+
+We will be creating the models directory which will be used to define our database schema. A Schema is a blueprint of how our database will be structured which include other fields which may not be required to be stored in the database.
+
+Inside the `todo` directory, run `npm install mongoose` to install mongoose.
+
+Create a `models` directory and then create a file in it `todo.js` Write the below code inside the todo.js file
+
+
+![Todo](./Images/todo.PNG)
+
+we need to update our routes from the file api.js in ‘routes’ directory to make use of the new model.
+
+In Routes directory, open `api.js` with vim api.js, delete the code inside with `:%d` command and paste there code below into it then save and exit
+
+
+```
+const express = require ('express');
+const router = express.Router();
+const Todo = require('../models/todo');
+
+router.get('/todos', (req, res, next) => {
+
+//this will return all the data, exposing only the id and action field to the client
+Todo.find({}, 'action')
+.then(data => res.json(data))
+.catch(next)
+});
+
+router.post('/todos', (req, res, next) => {
+if(req.body.action){
+Todo.create(req.body)
+.then(data => res.json(data))
+.catch(next)
+}else {
+res.json({
+error: "The input field is empty"
+})
+}
+});
+
+router.delete('/todos/:id', (req, res, next) => {
+Todo.findOneAndDelete({"_id": req.params.id})
+.then(data => res.json(data))
+.catch(next)
+})
+
+module.exports = router;
+```
+
