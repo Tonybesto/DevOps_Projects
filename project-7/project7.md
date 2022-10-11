@@ -14,6 +14,8 @@ In this project you will implement a solution that consists of following compone
 
 * Code Repository: Github
 
+![Architecture](./Images/application%20diagram.PNG)
+
 
 ## STEP 1 – PREPARE NFS SERVER
 
@@ -73,7 +75,7 @@ sudo mount /dev/webdata-vg/lv-opt /mnt/opt
 ```
 * Once mount is completed run **`sudo blkid`** to get the UUID of the mount part, open and paste the UUID in the fstab file.
 
-`sudo vi /etc/fstab`
+**`sudo vi /etc/fstab`**
 
 ```
 sudo mount -a 
@@ -140,6 +142,8 @@ rpcinfo -p | grep nfs
 **Important note: In order for NFS server to be accessible from your client, you must also open following ports: TCP 111, UDP 111, UDP 2049**
 
 
+![TCP and UDP](./Images/tcp%20and%20udp.PNG)
+
 ## STEP 2 –  CONFIGURE THE DATABASE SERVER
 
 1. Install MySQL server
@@ -181,11 +185,15 @@ During the next steps we will do following:
 
 `sudo yum install nfs-utils nfs4-acl-tools -y`
 
+![NFS Client ](./Images/install%20nfs%20utility%20on%20webserver.PNG)
+
 3. Mount /var/www/ and target the NFS server’s export for apps
 ```
 sudo mkdir /var/www
 sudo mount -t nfs -o rw,nosuid <NFS-Server-Private-IP-Address>:/mnt/apps /var/www
 ```
+
+![Mount Target](./Images/mount%20and%20target%20the%20nfs%20server.PNG)
 
 4. Verify that NFS was mounted successfully by running df -h. Make sure that the changes will persist on Web Server after reboot:
 ```
@@ -195,6 +203,8 @@ add following line;
 
 <NFS-Server-Private-IP-Address>:/mnt/apps /var/www nfs defaults 0 0
 ```
+
+![Verify mount ](./Images/verify%20nfs%20mounted.PNG)
 
 5. Install Remi’s repository, Apache and PHP
 ```
@@ -223,6 +233,8 @@ sudo setsebool -P httpd_execmem 1
 
 
 7. Locate the log folder for Apache on the Web Server and mount it to NFS server’s export for logs. Repeat step 4 under the 'prepare web servers' to make sure the mount point will persist after reboot.
+
+![mount log/httpd](./Images/mount%20httpd.PNG)
 
 `sudo vi /etc/fstab`
 
@@ -256,6 +268,8 @@ sudo systemctl status httpd
 10. Update the website’s configuration to connect to the database (in /var/www/html/functions.php file). Apply tooling-db.sql script to your database using this command mysql -h <databse-private-ip> -u <db-username> -p <db-pasword> < tooling-db.sql
 
 
+![update website configuration](./Images/update%20website%20configuration.PNG)
+
 * Install MySQL on the web servers using **`sudo yum install mysql -y`** then cd into the tooling directory to connect to thhe database.
 
 ![Apply Tooling](./Images/apply%20tooling%20script.PNG)
@@ -287,4 +301,7 @@ INSERT INTO ‘users’ (‘id’, ‘username’, ‘password’, ’email’, 
 ![login page](./Images/login%20page.PNG)
 
 ![Admin tooling page](./Images/admin-tooling%20page.PNG)
+
+
+### Thank You!! 
 
