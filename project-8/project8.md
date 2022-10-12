@@ -1,30 +1,30 @@
 ## CONFIGURE APACHE AS A LOAD BALANCER
 ---
 
-Before we produce with the project we need to make sure we have the following prerequisites
+Before we proceed with the project we need to make sure we have the following prerequisites
 
 Prerequisites:
 
-Make sure that you have following servers installed and configured within Project-7:
+Make sure that you have following servers are installed and configured within Project-7:
 
-* Two RHEL8 Web Servers
+* Two RHEL 8 Web Servers
 * One MySQL DB Server (based on Ubuntu 20.04)
-* One RHEL8 NFS server
+* One RHEL 8 NFS server
 
 ![Architecture](./Images/architecture%20for%20project%208.PNG)
 
 ### Configure Apache As A Load Balancer
 
-1. Create an Ubuntu Server 20.04 EC2 instance and name it Project-8-apache-lb, so your EC2 list will look like this:
+1. Create an Ubuntu Server 20.04 EC2 instance and name it `Project-8-apache-lb`, so your EC2 list will look like this:
 
 ![Apache Loadbalancer](./Images/apache%20load-balancer%20instance.PNG)
 
 
-2. Open TCP port 80 on Project-8-apache-lb by creating an Inbound Rule in Security Group.
+2. Open TCP port 80 on `Project-8-apache-lb` by creating an Inbound Rule in Security Group.
 
 ![TCP port](./Images/TCp%20port%2080.PNG)
 
-3. Install Apache Load Balancer on Project-8-apache-lb server and configure it to point traffic coming to LB to both Web Servers:
+3. Install Apache Load Balancer on `Project-8-apache-lb` server and configure it to point traffic coming to LB to both Web Servers:
 
 ### Install apache2
 ```
