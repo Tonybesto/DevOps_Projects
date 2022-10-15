@@ -112,7 +112,7 @@ Configure triggering the job from GitHub webhook:
 
 Configure "Post-build Actions" to archive all the files – files resulted from a build are called "artifacts".
 
-    click on add post-build actions and click "Archive the Artifact" then save
+**click on add post-build actions and click "Archive the Artifact" then save**
 
 Now, go ahead and make some change in any file in your GitHub repository (e.g. README.MD file) and push the changes to the master branch.
 
