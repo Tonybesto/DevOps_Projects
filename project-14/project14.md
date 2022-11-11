@@ -398,6 +398,14 @@ We already have tooling website as a part of deployment through Ansible. Here we
 
 2. On you Jenkins server, install PHP, its dependencies and Composer tool (Feel free to do this manually at first, then update your Ansible accordingly later)
 
+```
+yum module reset php -y
+yum module enable php:remi-7.4 -y
+yum install -y php php-common php-mbstring php-opcache php-intl php-xml php-gd php-curl php-mysqlnd php-fpm php-json
+systemctl start php-fpm
+systemctl enable php-fpm
+```
+
 sudo apt install -y zip libapache2-mod-php phploc php-{xml,bcmath,bz2,intl,gd,mbstring,mysql,zip}
 
 
@@ -407,10 +415,121 @@ sudo apt install -y zip libapache2-mod-php phploc php-{xml,bcmath,bz2,intl,gd,mb
 
 * Artifactory plugin
 
+4. Spin up another server that will host the jfrog artifactory 
+
+![open port for artifactory](./Images/open%20ports%20for%20artifactory.PNG)
+
+![jfrog homepage](./Images/jforg%20homepage.PNG)
+
+
 We will use plot plugin to display tests reports, and code coverage information.
 The Artifactory plugin will be used to easily upload code artifacts into an Artifactory server.
 
-4. In Jenkins UI configure Artifactory
+5. In Jenkins UI configure Artifactory
+
+![Configure Artifactory](./Images/configure%20artifactory%20on%20jenkins.PNG)
+
+
+## **Phase 2 – Integrate Artifactory repository with Jenkins**
+
+
+1. Create a dummy Jenkinsfile in the repository
+   
+2. Using Blue Ocean, create a multibranch Jenkins pipeline
+   
+3. On the database server, create database and user
+
+```
+Create database homestead;
+CREATE USER 'homestead'@'%' IDENTIFIED BY 'sePret^i';
+GRANT ALL PRIVILEGES ON * . * TO 'homestead'@'%';
+```
+
+![create homestead database](./Images/create%20homestead%20database%20and%20user.PNG)
+
+4. Update the database connectivity requirements in the file .env.sample
+
+
+5. Update Jenkinsfile with proper pipeline configuration
+
+```
+pipeline {
+    agent any
+
+  stages {
+
+     stage("Initial cleanup") {
+          steps {
+            dir("${WORKSPACE}") {
+              deleteDir()
+            }
+          }
+        }
+
+    stage('Checkout SCM') {
+      steps {
+            git branch: 'main', url: 'https://github.com/darey-devops/php-todo.git'
+      }
+    }
+
+    stage('Prepare Dependencies') {
+      steps {
+             sh 'mv .env.sample .env'
+             sh 'composer install'
+             sh 'php artisan migrate'
+             sh 'php artisan db:seed'
+             sh 'php artisan key:generate'
+      }
+    }
+  }
+}
+```
+
+
+
+
+
+
+
+
+
+
+## End-to-End Pipeline Overview
+
+Conditionally deploy to higher environments In the real world, developers will work on feature branch in a repository (e.g., GitHub or GitLab). There are other branches that will be used differently to control how software releases are done. You will see such branches as:
+
+Develop Master or Main (The * is a place holder for a version number, Jira Ticket name or some description. It can be something like Release-1.0.0) Feature/* Release/* Hotfix/* etc.
+
+There is a very wide discussion around release strategy, and git branching strategies which in recent years are considered under what is known as GitFlow (Have a read and keep as a bookmark – it is a possible candidate for an interview discussion, so take it seriously!)
+
+Assuming a basic gitflow implementation restricts only the develop branch to deploy code to Integration environment like sit.
+
+Let us update our Jenkinsfile to implement this:
+
+First, we will include a When condition to run Quality Gate whenever the running branch is either develop, hotfix, release, main, or master
+
+```
+stage('SonarQube Quality Gate') {
+      when { branch pattern: "^develop*|^hotfix*|^release*|^main*", comparator: "REGEXP"}
+        environment {
+            scannerHome = tool 'SonarQubeScanner'
+        }
+        steps {
+            withSonarQubeEnv('sonarqube') {
+                sh "${scannerHome}/bin/sonar-scanner -Dproject.settings=sonar-project.properties"
+            }
+            timeout(time: 1, unit: 'MINUTES') {
+                waitForQualityGate abortPipeline: true
+            }
+        }
+    }
+```
+
+
+![no deploy to dev](./Images/no%20deploy%20to%20dev%20env.PNG)
+
+![sonarqube dashboard](./Images/sonarqube%20dashboard.PNG)
+
 
 
 
