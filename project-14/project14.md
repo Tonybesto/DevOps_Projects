@@ -439,6 +439,12 @@ The Artifactory plugin will be used to easily upload code artifacts into an Arti
    
 3. On the database server, create database and user
 
+Install mysql client: `sudo apt install mysql -y`
+
+4. Login into the DB-server(mysql server) and set the the bind address to 0.0.0.0: sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
+
+5. Create database and user. NOTE: The task of setting the database is done by the MySQL ansible role
+
 ```
 Create database homestead;
 CREATE USER 'homestead'@'%' IDENTIFIED BY 'sePret^i';
@@ -447,10 +453,14 @@ GRANT ALL PRIVILEGES ON * . * TO 'homestead'@'%';
 
 ![create homestead database](./Images/create%20homestead%20database%20and%20user.PNG)
 
-4. Update the database connectivity requirements in the file .env.sample
+![database created](./Images/database%20created.PNG)
+
+1. Update the database connectivity requirements in the file .env.sample
+
+![create homestead database](./Images/create%20homestead%20database%20and%20user.PNG)
 
 
-5. Update Jenkinsfile with proper pipeline configuration
+2. Update Jenkinsfile with proper pipeline configuration
 
 ```
 pipeline {
@@ -484,8 +494,72 @@ pipeline {
   }
 }
 ```
+**When running we get an error. This is due to the fact that the Jenkins Server being the client server cant communicate with the DB server.**
+
+![error db connection](./Images/error%20due%20to%20DB%20connection.PNG)
+
+3. We need to install mysql client on the Jenkins server and configure it.
+
+![edit the env](./Images/edit%20the%20env-sample.PNG)
+
+The DB migration job passes after setting up the MYSQL client on the Jenkins server
+
+![plot build](./Images/plot%20build.PNG)
+![plot graph](./Images/phploc%20graph.PNG)
 
 
+4. Bundle the application code into an artifact (archived package) and upload to Artifactory
+
+
+`Install Zip: Sudo apt install zip -y`
+
+
+```
+stage ('Package Artifact') {
+    steps {
+            sh 'zip -qr php-todo.zip ${WORKSPACE}/*'
+     }
+    }
+```    
+5. Publish the resulted artifact into Artifactory making sure ti specify the target as the name of the artifactory repository you created earlier
+
+```
+stage ('Upload Artifact to Artifactory') {
+          steps {
+            script { 
+                 def server = Artifactory.server 'artifactory-server'                 
+                 def uploadSpec = """{
+                    "files": [
+                      {
+                       "pattern": "php-todo.zip",
+                       "target": "PBL/php-todo",
+                       "props": "type=zip;status=ready"
+
+                       }
+                    ]
+                 }""" 
+
+                 server.upload spec: uploadSpec
+               }
+            }
+
+        }
+```
+
+![todo to artifactory](./Images/todo%20to%20artifactory.PNG)
+
+Deploy the application to the dev environment by launching Ansible pipeline. Ensure you update your inventory/dev with the Private IP of your TODO-server and your site.yml file is updated with todo play.
+
+```
+stage ('Deploy to Dev Environment') {
+    steps {
+    build job: 'ansible-project/main', parameters: [[$class: 'StringParameterValue', name: 'env', value: 'dev']], propagate: false, wait: true
+    }
+  }
+```
+![deployment to dev env](./Images/deployment%20to%20dev%20env.PNG)
+
+![todo app](./Images/todo%20app.PNG)
 
 
 ## SONARQUBE INSTALLATION
