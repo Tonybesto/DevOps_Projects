@@ -100,7 +100,7 @@ Add below configuration to the main.tf file:
     vpc_id                     = aws_vpc.main.id
     cidr_block                 = "172.16.0.0/24"
     map_public_ip_on_launch    = true
-    availability_zone          = "eu-central-1a"
+    availability_zone          = "us-east-1a"
 
 }
 
@@ -109,7 +109,7 @@ Add below configuration to the main.tf file:
     vpc_id                     = aws_vpc.main.id
     cidr_block                 = "172.16.1.0/24"
     map_public_ip_on_launch    = true
-    availability_zone          = "eu-central-1b"
+    availability_zone          = "us-east-1b"
 }
 ```
 
@@ -133,7 +133,7 @@ Starting with the provider block, declare a variable named region, give it a def
 
 ```
     variable "region" {
-        default = "us-west-2"
+        default = "us-east-1"
     }
 
     provider "aws" {
@@ -141,7 +141,7 @@ Starting with the provider block, declare a variable named region, give it a def
     }
 Do the same to cidr value in the vpc block, and all the other arguments.
     variable "region" {
-        default = "eu-central-1"
+        default = "us-east-1"
     }
 
     variable "vpc_cidr" {
@@ -285,7 +285,7 @@ state = "available"
 }
 
 variable "region" {
-      default = "eu-central-1"
+      default = "us-east-1"
 }
 
 variable "vpc_cidr" {
@@ -385,7 +385,7 @@ resource "aws_subnet" "public" {
 
 ```
 variable "region" {
-      default = "eu-central-1"
+      default = "us-east-1"
 }
 
 variable "vpc_cidr" {
@@ -416,7 +416,7 @@ variable "enable_classiclink_dns_support" {
 ## terraform.tfvars
 
 ```
-region = "eu-central-1"
+region = "us-east-1"
 
 vpc_cidr = "172.16.0.0/16" 
 
