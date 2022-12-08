@@ -40,3 +40,5 @@ The following projects will be implemented:
 17. AUTOMATE INFRASTRUCTURE WITH IAC USING TERRAFORM. PART 2
 
 18. AUTOMATE INFRASTRUCTURE WITH IAC USING TERRAFORM. PART 3 --Refactoring
+
+19. Automate Infrastructure With IaC using Terraform – Terraform Cloud
