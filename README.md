@@ -42,3 +42,5 @@ The following projects will be implemented:
 18. AUTOMATE INFRASTRUCTURE WITH IAC USING TERRAFORM. PART 3 --Refactoring
 
 19. Automate Infrastructure With IaC using Terraform – Terraform Cloud
+    
+20. MIGRATION TO THE СLOUD WITH CONTAINERIZATION. PART 1 - DOCKER & DOCKER COMPOSE
