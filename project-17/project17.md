@@ -1112,7 +1112,7 @@ systemctl restart httpd
 ```
 
 
-# STEP 10: Creating Database And EFS Rwsources
+# STEP 10: Creating Database And EFS Resources
 
 - Creating a new file called efs.tf.
 - Entering the following code to create KMS key to encrypt EFS resource:
