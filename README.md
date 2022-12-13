@@ -44,3 +44,5 @@ The following projects will be implemented:
 19. Automate Infrastructure With IaC using Terraform – Terraform Cloud
     
 20. MIGRATION TO THE СLOUD WITH CONTAINERIZATION. PART 1 - DOCKER & DOCKER COMPOSE
+    
+21. ORCHESTRATING CONTAINERS ACROSS MULTIPLE VIRTUAL SERVERS WITH KUBERNETES. PART 1

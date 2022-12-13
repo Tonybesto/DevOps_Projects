@@ -298,3 +298,14 @@ The project below will challenge you a little bit, but the experience there is v
 ![docker login](./Images/docker%20login.PNG)
 ![docker tag](./Images/docker%20tag%20and%20push.PNG)
 ![docker image](./Images/image%20pushed.PNG)
+
+
+### Part 3
+
+1. Write a Jenkinsfile that will simulate a Docker Build and a Docker Push to the registry
+2. Connect your repo to Jenkins
+3. Create a multi-branch pipeline
+4. Simulate a CI pipeline from a feature and master branch using previously created Jenkinsfile
+5. Ensure that the tagged images from your Jenkinsfile have a prefix that suggests which branch the image was pushed from. For example, feature-0.0.1.
+6. Verify that the images pushed from the CI can be found at the registry.
+
