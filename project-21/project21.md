@@ -297,6 +297,8 @@ LOAD_BALANCER_ARN=$(aws elbv2 create-load-balancer \
 --output text --query 'LoadBalancers[].LoadBalancerArn')
 ```
 
+![](./Images/route%20tables.PNG)
+
 ## Tagret Group
 
 15. Create a target group: (For now it will be unhealthy because there are no real targets yet.)
@@ -309,6 +311,7 @@ TARGET_GROUP_ARN=$(aws elbv2 create-target-group \
   --target-type ip \
   --output text --query 'TargetGroups[].TargetGroupArn')
 ```
+![](./Images/target%20group.PNG)
 
 16. Register targets: (Just like above, no real targets. You will just put the IP addresses so that, when the nodes become available, they will be used as targets.)
 ```
@@ -316,6 +319,8 @@ aws elbv2 register-targets \
   --target-group-arn ${TARGET_GROUP_ARN} \
   --targets Id=172.31.0.1{0,1,2}
 ```
+![](./Images/register%20targets.PNG)
+
 
 17. Create a listener to listen for requests and forward to the target nodes on TCP port 6443
 ```
@@ -326,7 +331,7 @@ aws elbv2 create-listener \
 --default-actions Type=forward,TargetGroupArn=${TARGET_GROUP_ARN} \
 --output text --query 'Listeners[].ListenerArn'
 ```
-
+![](./Images/listeners.PNG)
 ## Step 2 – Create Compute Resources
 AMI
 
@@ -375,7 +380,7 @@ for i in 0 1 2; do
     --tags "Key=Name,Value=${NAME}-master-${i}"
 done
 ```
-
+![](./Images/master%20nodes.PNG)
 ## EC2 Instances for Worker Nodes
 
 Create 3 worker nodes:
@@ -400,7 +405,7 @@ for i in 0 1 2; do
     --tags "Key=Name,Value=${NAME}-worker-${i}"
 done
 ```
-
+![](./Images/worker%20nodes.PNG)
 ## Step 3 Prepare The Self-Signed Certificate Authority And Generate TLS Certificates
 
 The PKI Infrastructure is provisioned using cfssl which will have a Certificate Authority which will then generate certificates for all the individual components:
@@ -450,7 +455,7 @@ cfssl gencert -initca ca-csr.json | cfssljson -bare ca
 
 }
 ```
-
+![](./Images/certificates%20and%20keys.PNG)
 ### Generating TLS Certificates For Client and Server
 
 The certificate for the Api-server must have IP addresses, DNS names, and a Load Balancer address included. Otherwise, you will have a lot of difficulties connecting to the api-server.
@@ -714,4 +719,187 @@ cfssl gencert \
   service-account-csr.json | cfssljson -bare service-account
 }
 ```
+
+## Step 4 – Distributing the Client and Server Certificates
+
+Now it is time to start sending all the client and server certificates to their respective instances.
+
+Let us begin with the **worker nodes**:
+
+Copy these files securely to the worker nodes using scp utility
+
+- Root CA certificate – ca.pem
+- X509 Certificate for each worker node
+- Private Key of the certificate for each worker node
+
+```
+for i in 0 1 2; do
+  instance="${NAME}-worker-${i}"
+  external_ip=$(aws ec2 describe-instances \
+    --filters "Name=tag:Name,Values=${instance}" \
+    --output text --query 'Reservations[].Instances[].PublicIpAddress')
+  scp -i ../ssh/${NAME}.id_rsa \
+    ca.pem ${instance}-key.pem ${instance}.pem ubuntu@${external_ip}:~/; \
+done
+```
+
+**Master or Controller node**: – Note that only the api-server related files will be sent over to the master nodes.
+```
+for i in 0 1 2; do
+instance="${NAME}-master-${i}" \
+  external_ip=$(aws ec2 describe-instances \
+    --filters "Name=tag:Name,Values=${instance}" \
+    --output text --query 'Reservations[].Instances[].PublicIpAddress')
+  scp -i ../ssh/${NAME}.id_rsa \
+    ca.pem ca-key.pem service-account-key.pem service-account.pem \
+    master-kubernetes.pem master-kubernetes-key.pem ubuntu@${external_ip}:~/;
+done
+```
+![](./Images/client%20certificate.PNG)
+
+## STEP 5 USE `KUBECTL` TO GENERATE KUBERNETES CONFIGURATION FILES FOR AUTHENTICATION
+
+First, let us create a few environment variables for reuse by multiple commands.
+```
+KUBERNETES_API_SERVER_ADDRESS=$(aws elbv2 describe-load-balancers --load-balancer-arns ${LOAD_BALANCER_ARN} --output text --query 'LoadBalancers[].DNSName')
+```
+
+1. Generate the kubelet kubeconfig file
+
+```
+for i in 0 1 2; do
+
+instance="${NAME}-worker-${i}"
+instance_hostname="ip-172-31-0-2${i}"
+
+ # Set the kubernetes cluster in the kubeconfig file
+  kubectl config set-cluster ${NAME} \
+    --certificate-authority=ca.pem \
+    --embed-certs=true \
+    --server=https://$KUBERNETES_API_SERVER_ADDRESS:6443 \
+    --kubeconfig=${instance}.kubeconfig
+
+# Set the cluster credentials in the kubeconfig file
+  kubectl config set-credentials system:node:${instance_hostname} \
+    --client-certificate=${instance}.pem \
+    --client-key=${instance}-key.pem \
+    --embed-certs=true \
+    --kubeconfig=${instance}.kubeconfig
+
+# Set the context in the kubeconfig file
+  kubectl config set-context default \
+    --cluster=${NAME} \
+    --user=system:node:${instance_hostname} \
+    --kubeconfig=${instance}.kubeconfig
+
+  kubectl config use-context default --kubeconfig=${instance}.kubeconfig
+done
+```
+
+2. Generate the kube-proxy kubeconfig
+
+```
+{
+  kubectl config set-cluster ${NAME} \
+    --certificate-authority=ca.pem \
+    --embed-certs=true \
+    --server=https://${KUBERNETES_API_SERVER_ADDRESS}:6443 \
+    --kubeconfig=kube-proxy.kubeconfig
+
+  kubectl config set-credentials system:kube-proxy \
+    --client-certificate=kube-proxy.pem \
+    --client-key=kube-proxy-key.pem \
+    --embed-certs=true \
+    --kubeconfig=kube-proxy.kubeconfig
+
+  kubectl config set-context default \
+    --cluster=${NAME} \
+    --user=system:kube-proxy \
+    --kubeconfig=kube-proxy.kubeconfig
+
+  kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig
+}
+```
+
+3. Generate the Kube-Controller-Manager kubeconfig
+
+```
+{
+  kubectl config set-cluster ${NAME} \
+    --certificate-authority=ca.pem \
+    --embed-certs=true \
+    --server=https://127.0.0.1:6443 \
+    --kubeconfig=kube-controller-manager.kubeconfig
+
+  kubectl config set-credentials system:kube-controller-manager \
+    --client-certificate=kube-controller-manager.pem \
+    --client-key=kube-controller-manager-key.pem \
+    --embed-certs=true \
+    --kubeconfig=kube-controller-manager.kubeconfig
+
+  kubectl config set-context default \
+    --cluster=${NAME} \
+    --user=system:kube-controller-manager \
+    --kubeconfig=kube-controller-manager.kubeconfig
+
+  kubectl config use-context default --kubeconfig=kube-controller-manager.kubeconfig
+}
+```
+
+
+4. Generating the Kube-Scheduler Kubeconfig
+
+```
+{
+  kubectl config set-cluster ${NAME} \
+    --certificate-authority=ca.pem \
+    --embed-certs=true \
+    --server=https://127.0.0.1:6443 \
+    --kubeconfig=kube-scheduler.kubeconfig
+
+  kubectl config set-credentials system:kube-scheduler \
+    --client-certificate=kube-scheduler.pem \
+    --client-key=kube-scheduler-key.pem \
+    --embed-certs=true \
+    --kubeconfig=kube-scheduler.kubeconfig
+
+  kubectl config set-context default \
+    --cluster=${NAME} \
+    --user=system:kube-scheduler \
+    --kubeconfig=kube-scheduler.kubeconfig
+
+  kubectl config use-context default --kubeconfig=kube-scheduler.kubeconfig
+}
+```
+
+5. Finally, generate the kubeconfig file for the admin user
+
+```
+{
+  kubectl config set-cluster ${NAME} \
+    --certificate-authority=ca.pem \
+    --embed-certs=true \
+    --server=https://${KUBERNETES_API_SERVER_ADDRESS}:6443 \
+    --kubeconfig=admin.kubeconfig
+
+  kubectl config set-credentials admin \
+    --client-certificate=admin.pem \
+    --client-key=admin-key.pem \
+    --embed-certs=true \
+    --kubeconfig=admin.kubeconfig
+
+  kubectl config set-context default \
+    --cluster=${NAME} \
+    --user=admin \
+    --kubeconfig=admin.kubeconfig
+
+  kubectl config use-context default --kubeconfig=admin.kubeconfig
+}
+```
+
+### ***Note: Distribute the files to their respective servers, using `scp` and a for loop like we have done previously. This is a test to validate that you understand which component must go to which node.***
+
+![](./Images/sending%20kubeconfig%20to%20master.PNG)
+![](./Images/sending%20kubeconfig%20to%20worker.PNG)
+
 
