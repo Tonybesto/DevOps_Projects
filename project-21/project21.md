@@ -1236,3 +1236,78 @@ sudo systemctl status kube-scheduler
 }
 ```
 ![](./Images/kube-apiserver%20status.PNG)
+
+![](./Images/kube-controller-manager%20status.PNG)
+
+Test that Everything is working fine
+
+To get the cluster details run:
+
+`kubectl cluster-info  --kubeconfig admin.kubeconfig`
+
+
+To get the current namespaces:
+
+`kubectl get namespaces --kubeconfig admin.kubeconfig`
+![](./Images/cluster%20info%20and%20namespace.PNG)
+
+
+To get the status of each component:
+
+`kubectl get componentstatuses --kubeconfig admin.kubeconfig`
+
+![](./Images/health%20status.PNG)
+![](./Images/target%20status.PNG)
+
+On one of the controller nodes, configure Role Based Access Control (RBAC) so that the api-server has necessary authorization for for the kubelet.
+
+Create the ClusterRole:
+
+```
+cat <<EOF | kubectl apply --kubeconfig admin.kubeconfig -f -
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  labels:
+    kubernetes.io/bootstrapping: rbac-defaults
+  name: system:kube-apiserver-to-kubelet
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - nodes/proxy
+      - nodes/stats
+      - nodes/log
+      - nodes/spec
+      - nodes/metrics
+    verbs:
+      - "*"
+EOF
+```
+
+Create the ClusterRoleBinding to bind the kubernetes user with the role created above:
+
+```
+cat <<EOF | kubectl --kubeconfig admin.kubeconfig  apply -f -
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: system:kube-apiserver
+  namespace: ""
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:kube-apiserver-to-kubelet
+subjects:
+  - apiGroup: rbac.authorization.k8s.io
+    kind: User
+    name: kubernetes
+EOF
+```
+
+![](./Images/containerd%20status.PNG)
+
+![](./Images/get%20nodes.PNG)
+
