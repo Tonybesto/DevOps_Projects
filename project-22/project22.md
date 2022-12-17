@@ -168,3 +168,110 @@ copy and paste the load balancer dns in your browser
 ![](./Images/dns%20working.PNG)
 
 
+## USING DEPLOYMENT CONTROLLERS
+
+Do not Use Replication Controllers – Use Deployment Controllers Instead
+Kubernetes is loaded with a lot of features, and with its vibrant open source community, these features are constantly evolving and adding up.
+
+Previously, you have seen the improvements from ReplicationControllers (RC), to ReplicaSets (RS). In this section you will see another K8s object which is highly recommended over Replication objects (RC and RS).
+
+Delete the ReplicaSet
+```
+kubectl delete rs nginx-rs
+```
+
+Create a  `deployment.yaml` manifest
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    tier: frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        tier: frontend
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+```
+create the deployment using:
+```
+kubectl apply -f deployment.yaml
+```
+
+![](./Images/create%20deployment.PNG)
+
+
+Exec into one of the Pod’s container to run Linux commands
+
+```
+kubectl exec -it nginx-deployment-56466d4948-78j9c bash
+```
+
+![](./Images/exec%20deployment.PNG)
+
+
+
+## PERSISTING DATA FOR PODS
+
+Deployments are stateless by design. Hence, any data stored inside the Pod’s container does not persist when the Pod dies.
+
+If you were to update the content of the index.html file inside the container, and the Pod dies, that content will not be lost since a new Pod will replace the dead one.
+
+Let us try that:
+
+Exec into the running container
+
+Install vim so that you can edit the file
+
+```
+apt-get update
+apt-get install vim
+```
+
+Update the content of the file and add the code below `/usr/share/nginx/html/index.html`
+
+```
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to DAREY.IO!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to DAREY.IO!</h1>
+<p>I love experiencing Kubernetes</p>
+
+<p>Learning by doing is absolutely the best strategy at 
+<a href="https://darey.io/">www.darey.io</a>.<br/>
+for skills acquisition
+<a href="https://darey.io/">www.darey.io</a>.</p>
+
+<p><em>Thank you for learning from DAREY.IO</em></p>
+</body>
+</html>
+```
+
+![](./Images/install%20vim.PNG)
+
+![](./Images/darey.io%20page.PNG)
+
+
+
