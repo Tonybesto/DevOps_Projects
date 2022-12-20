@@ -52,36 +52,17 @@ A dynamic inventory is a script written in Python, PHP, or any other programming
 
 We make use of dynamic inventory to get Ip address of our servers created based on their tag names and hence we are able to run the required role on each server.
 ![](./Images/ansible-graph.PNG)
-![](./img/8.ansible_pb_1.jpg)
-#
 
 
-## Step 4. Validating Application Setup
 #
 
-## Checking tooling was properly setup
-![](./img/9.tooling_valid.jpg)
+##  Step 4. Checking Successful 
+#
+![](./Images/tooling%20site.PNG)
+![](./Images/wordpress.PNG)
 #
 
-## Checking wordpress was properly setup
-![](./img/10.wp_valid.jpg)
-![](./img/11.db_setup.jpg)
-![](./img/12.localhost_success.jpg)
+## Step 5. Destroying Resources
 #
-
-## Checking All HealthCheck Status for  all Target groups
-![](./img/13.healthcheck_nginx.jpg)
-![](./img/14.healthcheck_tooling.jpg)
-![](./img/15.healthcheck_wp.jpg)
-#
-
-##  Step 5. Checking Successful 
-#
-![](./img/16.tooling_success.jpg)
-![](./img/17.wordpress_success.jpg)
-#
-
-## Step 6. Destroying Resources
-#
-![](./img/18.destroy_resources.jpg)
+![](./Images/terraform%20destroy.PNG)
 #
