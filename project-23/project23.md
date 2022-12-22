@@ -151,6 +151,50 @@ apiVersion: v1
       storageClassName: gp2
 ```
 
-- Checking the setup:$ kubectl get pvc
+- Checking the setup:
 
+`kubectl get pvc`
+
+
+Checking for the volume binding section:
+```
+kubectl describe storageclass gp2
+```
+
+![](./Images/vbm.PNG)
+
+
+The PVC created is in pending state because PV is not created yet. Editing the nginx-pod.yaml file to create the PV:
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    tier: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        tier: frontend
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: nginx-volume-claim
+          mountPath: /tmp/tony
+      volumes:
+      - name: nginx-volume-claim
+        persistentVolumeClaim:
+          claimName: nginx-volume-claim
+```
+- The '/tmp/tony' directory will be persisted, and any data written in there will be stored permanetly on the volume, which can be used by another Pod if the current one gets replaced.
 
