@@ -21,6 +21,8 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: nginx-pod
+  labels: 
+    app: nginx-pod
 spec:
   containers:
   - image: nginx:latest
