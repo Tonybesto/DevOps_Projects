@@ -151,7 +151,7 @@ Flags used
 - -d runs the container in detached mode
 - --network connects a container to a network
 - -h specifies a hostname
-- 
+  
 If the image is not found locally, it will be downloaded from the registry.
 
 Verify the container is running:
@@ -165,7 +165,9 @@ it is best practice not to connect to the MySQL server remotely using the root u
 
 Create a file and name it `create_user.sql` and add the below code in the file:
 
-`CREATE USER ''@'%' IDENTIFIED BY ''; GRANT ALL PRIVILEGES ON * . * TO ''@'%';` 
+`CREATE USER ''@'%' IDENTIFIED BY '';`
+  
+ `GRANT ALL PRIVILEGES ON * . * TO ''@'%';` 
 
 Run the script:
 Ensure you are in the directory create_user.sql file is located or declare a path
