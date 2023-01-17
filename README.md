@@ -2,7 +2,7 @@
 Darey.io Project Based Learning 
 
 The following projects will be implemented:
-
+```
 1. ***AWS-LAMP-STACK IMPLEMENTATION***
 
 2. ***LEMP STACK IMPLEMENTATION***
@@ -50,3 +50,4 @@ The following projects will be implemented:
 22. ***DEPLOYING APPLICATIONS INTO KUBERNETES CLUSTER***
 
 23. ***PERSISTING DATA IN KUBERNETES***
+```
