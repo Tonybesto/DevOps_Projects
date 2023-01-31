@@ -2,7 +2,7 @@
 
 # "Kubernetes From-Ground-Up"
 
-K8s installation options
+### **K8s installation options**
 
 To successfully implement "K8s From-Ground-Up", the following and even more will be done by you as a K8s administrator:
 
