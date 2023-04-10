@@ -1,4 +1,5 @@
 # DevOps_Projects
+
 Darey.io Project Based Learning 
 
 The following projects will be implemented:
@@ -43,10 +44,12 @@ The following projects will be implemented:
 
 19. ***Automate Infrastructure With IaC using Terraform – Terraform Cloud***
     
-20. **MIGRATION TO THE СLOUD WITH CONTAINERIZATION. PART 1 - DOCKER & DOCKER COMPOSE***
+20. ***MIGRATION TO THE СLOUD WITH CONTAINERIZATION PART 1 - DOCKER & DOCKER COMPOSE***
     
 21. ***ORCHESTRATING CONTAINERS ACROSS MULTIPLE VIRTUAL SERVERS WITH KUBERNETES. PART 1***
 
 22. ***DEPLOYING APPLICATIONS INTO KUBERNETES CLUSTER***
 
 23. ***PERSISTING DATA IN KUBERNETES***
+
+24. ***BUILDING ELASTIC KUBERNETES SERVICE (EKS) WITH TERRAFORM***
