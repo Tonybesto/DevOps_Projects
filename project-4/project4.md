@@ -40,7 +40,7 @@ Upgrade ubuntu
 ```
 sudo apt -y install curl dirmngr apt-transport-https lsb-release ca-certificates
 
-curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 ```
 
 
@@ -156,41 +156,51 @@ Create a file named routes.js
 Copy and paste the code below into routes.js
 
 ```
-var Book = require('./models/book');
+const Book = require('./models/book');
+
 module.exports = function(app) {
   app.get('/book', function(req, res) {
-    Book.find({}, function(err, result) {
-      if ( err ) throw err;
+    Book.find({}).then(result => {
       res.json(result);
-    });
-  }); 
-  app.post('/book', function(req, res) {
-    var book = new Book( {
-      name:req.body.name,
-      isbn:req.body.isbn,
-      author:req.body.author,
-      pages:req.body.pages
-    });
-    book.save(function(err, result) {
-      if ( err ) throw err;
-      res.json( {
-        message:"Successfully added book",
-        book:result
-      });
+    }).catch(err => {
+      console.error(err);
+      res.status(500).send('An error occurred while retrieving books');
     });
   });
+
+  app.post('/book', function(req, res) {
+    const book = new Book({
+      name: req.body.name,
+      isbn: req.body.isbn,
+      author: req.body.author,
+      pages: req.body.pages
+    });
+    book.save().then(result => {
+      res.json({
+        message: "Successfully added book",
+        book: result
+      });
+    }).catch(err => {
+      console.error(err);
+      res.status(500).send('An error occurred while saving the book');
+    });
+  });
+
   app.delete("/book/:isbn", function(req, res) {
-    Book.findOneAndRemove(req.query, function(err, result) {
-      if ( err ) throw err;
-      res.json( {
+    Book.findOneAndRemove(req.query).then(result => {
+      res.json({
         message: "Successfully deleted the book",
         book: result
       });
+    }).catch(err => {
+      console.error(err);
+      res.status(500).send('An error occurred while deleting the book');
     });
   });
-  var path = require('path');
+
+  const path = require('path');
   app.get('*', function(req, res) {
-    res.sendfile(path.join(__dirname + '/public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
   });
 };
 ```
