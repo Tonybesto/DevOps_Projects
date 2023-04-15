@@ -144,7 +144,7 @@ Express is a minimal and flexible Node.js web application framework that provide
 ![express install](./Images/install%20express.PNG)
 
 
-In ‘Books’ folder, create a folder named 
+In ‘Books’ folder, create a folder named apps 
 
 **`mkdir apps && cd apps`**
 
