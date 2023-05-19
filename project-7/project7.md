@@ -210,21 +210,26 @@ add following line;
 ```
 sudo yum install httpd -y
 
-sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+sudo yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 
-sudo dnf install dnf-utils http://rpms.remirepo.net/enterprise/remi-release-8.rpm
+sudo yum install dnf-utils http://rpms.remirepo.net/enterprise/remi-release-8.rpm
 
-sudo dnf module reset php
+sudo yum module  list php -y
 
-sudo dnf module enable php:remi-7.4
+sudo yum module reset php -y
 
-sudo dnf install php php-opcache php-gd php-curl php-mysqlnd
+sudo yum module enable php:remi-7.4 -y
+
+sudo yum install php php-opcache php-gd php-curl php-mysqlnd -y
 
 sudo systemctl start php-fpm
 
 sudo systemctl enable php-fpm
 
 sudo setsebool -P httpd_execmem 1
+
+sudo systemctl restart httpd
+
 ```
 
 ### **Repeat steps 1-5 for another 2 Web Servers.**
