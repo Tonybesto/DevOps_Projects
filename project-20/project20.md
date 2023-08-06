@@ -274,7 +274,7 @@ Run the container:
 
 Practice Task №1 – Implement a POC to migrate the PHP-Todo app into a containerized application.
 
-Download php-todo repository from [here](https://github.com/darey-devops/php-todo)
+Download php-todo repository from [here](https://github.com/Tonybesto/php-todo.git)
 
 The project below will challenge you a little bit, but the experience there is very valuable for future projects.
 
