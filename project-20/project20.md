@@ -209,7 +209,7 @@ Now you need to prepare a database schema so that the Tooling application can co
 
 Clone the Tooling-app repository from here:
 
-`git clone https://github.com/darey-devops/tooling.git` 
+`git clone https://github.com/Tonybesto/project20-tooling.git` 
 
 ![git clone](./Images/git%20clone%20tooling.PNG)
 
