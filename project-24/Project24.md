@@ -224,3 +224,100 @@ locals {
   }
 }
 ```
+
+
+
+.Add more variables to the `variables.tf` file
+
+# create some variables
+```
+variable "admin_users" {
+  type        = list(string)
+  description = "List of Kubernetes admins."
+}
+variable "developer_users" {
+  type        = list(string)
+  description = "List of Kubernetes developers."
+}
+variable "asg_instance_types" {
+  description = "List of EC2 instance machine types to be used in EKS."
+}
+variable "autoscaling_minimum_size_by_az" {
+  type        = number
+  description = "Minimum number of EC2 instances to autoscale our EKS cluster on each AZ."
+}
+variable "autoscaling_maximum_size_by_az" {
+  type        = number
+  description = "Maximum number of EC2 instances to autoscale our EKS cluster on each AZ."
+}
+
+```
+Create a file – `variables.tfvars` to set values for variables.
+```
+cluster_name            = "tooling-app-eks"
+iac_environment_tag     = "development"
+name_prefix             = "darey-io-eks"
+main_network_block      = "10.0.0.0/16"
+subnet_prefix_extension = 4
+zone_offset             = 8
+```
+
+# Ensure that these users already exist in AWS IAM. Another approach is that you can introduce an iam.tf file to manage users separately, get the data source and interpolate their ARN.
+
+```
+admin_users                    = ["darey", "solomon"]
+developer_users                = ["leke", "david"]
+asg_instance_types             = [ { instance_type = "t3.small" }, { instance_type = "t2.small" }, ]
+autoscaling_minimum_size_by_az = 1
+autoscaling_maximum_size_by_az = 10
+```
+
+Create file – `provider.tf`
+
+```
+provider "aws" {
+  region = "us-west-1"
+}
+provider "random" {
+}
+```
+
+Create a file – `variables.tfvars` to set values for variables.
+```
+cluster_name            = "tooling-app-eks"
+iac_environment_tag     = "development"
+name_prefix             = "darey-io-eks"
+main_network_block      = "10.0.0.0/16"
+subnet_prefix_extension = 4
+zone_offset             = 8
+```
+
+# Ensure that these users already exist in AWS IAM. Another approach is that you can introduce an iam.tf file to manage users separately, get the data source and interpolate their ARN.
+
+```
+admin_users                              = ["dare", "solomon"]
+developer_users                          = ["leke", "david"]
+asg_instance_types                       = ["t3.small", "t2.small"]
+autoscaling_minimum_size_by_az           = 1
+autoscaling_maximum_size_by_az           = 10
+autoscaling_average_cpu                  = 30
+```
+
+Run terraform init
+
+## Run Terraform plan – Your plan should have an output
+```
+Plan: 41 to add, 0 to change, 0 to destroy.
+```
+Run Terraform apply
+
+This will begin to create cloud resources, and fail at some point with the error
+```
+
+╷
+│ Error: Post "http://localhost/api/v1/namespaces/kube-system/configmaps": dial tcp [::1]:80: connect: connection refused
+│ 
+│   with module.eks-cluster.kubernetes_config_map.aws_auth[0],
+│   on .terraform/modules/eks-cluster/aws_auth.tf line 63, in resource "kubernetes_config_map" "aws_auth":
+│   63: resource "kubernetes_config_map" "aws_auth" {
+```
