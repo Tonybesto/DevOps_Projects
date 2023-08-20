@@ -1,5 +1,8 @@
 ### BUILDING ELASTIC KUBERNETES SERVICE (EKS) WITH TERRAFORM
 
+
+Repo to Terraform Code [Link](https://github.com/Tonybesto/EKS-Terraform)
+
 Open up a new directory on your laptop, and name it `EKS`
 Use AWS CLI to create an S3 bucket
 
@@ -323,4 +326,4 @@ This will begin to create cloud resources, and fail at some point with the error
 │   63: resource "kubernetes_config_map" "aws_auth" {
 ```
 
-https://github.com/Tonybesto/EKS-Terraform
+
