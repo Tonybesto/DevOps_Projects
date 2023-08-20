@@ -322,3 +322,5 @@ This will begin to create cloud resources, and fail at some point with the error
 │   on .terraform/modules/eks-cluster/aws_auth.tf line 63, in resource "kubernetes_config_map" "aws_auth":
 │   63: resource "kubernetes_config_map" "aws_auth" {
 ```
+
+https://github.com/Tonybesto/EKS-Terraform
