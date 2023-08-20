@@ -11,7 +11,7 @@ terraform {
 ```
 Create a file – `network.tf` and provision Elastic IP for Nat Gateway, VPC, Private and public subnets.
 
-## Reserve Elastic IP to be used in our NAT gateway
+### Reserve Elastic IP to be used in our NAT gateway
 
 ```
 resource "aws_eip" "nat_gw_elastic_ip" {
@@ -24,7 +24,7 @@ iac_environment = var.iac_environment_tag
 }
 ```
 
-## Create VPC using the official AWS module
+### Create VPC using the official AWS module
 
 ```
 module "vpc" {
@@ -99,7 +99,7 @@ Value: 1
 
 Create a file – `variables.tf`
 
-## create some variables
+### create some variables
 ```
 variable "cluster_name" {
 type        = string
@@ -137,6 +137,7 @@ data "aws_caller_identity" "current" {} # used for accesing Account ID and ARN
 ```
 
 Create a file – `eks.tf` and provision EKS cluster (Create the file only if you are not using your existing Terraform code. Otherwise you can simply append it to the main.tf from your existing code) Read more about this module from the official documentation here – Reading it will help you understand more about the rich features of the module.
+
 ```
 module "eks_cluster" {
   source  = "terraform-aws-modules/eks/aws"
@@ -167,9 +168,9 @@ module "eks_cluster" {
 ```
 
 
-8.Create a file – `locals.tf `to create local variables. Terraform does not allow assigning variable to variables. There is good reasons for that to avoid repeating your code unecessarily. So a terraform way to achieve this would be to use locals so that your code can be kept DRY
+8. Create a file – `locals.tf `to create local variables. Terraform does not allow assigning variable to variables. There is good reasons for that to avoid repeating your code unecessarily. So a terraform way to achieve this would be to use locals so that your code can be kept DRY
 
-# render Admin & Developer users list with the structure required by EKS module
+### render Admin & Developer users list with the structure required by EKS module
 ```
 locals {
   admin_user_map_users = [
@@ -227,9 +228,9 @@ locals {
 
 
 
-.Add more variables to the `variables.tf` file
+Add more variables to the `variables.tf` file
 
-# create some variables
+### create some variables
 ```
 variable "admin_users" {
   type        = list(string)
@@ -262,7 +263,7 @@ subnet_prefix_extension = 4
 zone_offset             = 8
 ```
 
-# Ensure that these users already exist in AWS IAM. Another approach is that you can introduce an iam.tf file to manage users separately, get the data source and interpolate their ARN.
+### Ensure that these users already exist in AWS IAM. Another approach is that you can introduce an iam.tf file to manage users separately, get the data source and interpolate their ARN.
 
 ```
 admin_users                    = ["darey", "solomon"]
@@ -292,7 +293,7 @@ subnet_prefix_extension = 4
 zone_offset             = 8
 ```
 
-# Ensure that these users already exist in AWS IAM. Another approach is that you can introduce an iam.tf file to manage users separately, get the data source and interpolate their ARN.
+### Ensure that these users already exist in AWS IAM. Another approach is that you can introduce an iam.tf file to manage users separately, get the data source and interpolate their ARN.
 
 ```
 admin_users                              = ["dare", "solomon"]
@@ -303,9 +304,9 @@ autoscaling_maximum_size_by_az           = 10
 autoscaling_average_cpu                  = 30
 ```
 
-Run terraform init
+`Run terraform init`
 
-## Run Terraform plan – Your plan should have an output
+### Run Terraform plan – Your plan should have an output
 ```
 Plan: 41 to add, 0 to change, 0 to destroy.
 ```
