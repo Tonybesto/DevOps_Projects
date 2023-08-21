@@ -327,3 +327,25 @@ This will begin to create cloud resources, and fail at some point with the error
 ```
 
 
+### FIXING THE ERROR
+To fix this problem
+
+Append to the file data.tf
+# get EKS cluster info to configure Kubernetes and Helm providers
+```
+data "aws_eks_cluster" "cluster" {
+  name = module.eks_cluster.cluster_id
+}
+data "aws_eks_cluster_auth" "cluster" {
+  name = module.eks_cluster.cluster_id
+}
+```
+Append to the file provider.tf
+# get EKS authentication for being able to manage k8s objects from terraform
+```
+provider "kubernetes" {
+  host                   = data.aws_eks_cluster.cluster.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
+  token                  = data.aws_eks_cluster_auth.cluster.token
+}
+```
