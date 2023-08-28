@@ -331,7 +331,7 @@ This will begin to create cloud resources, and fail at some point with the error
 To fix this problem
 
 Append to the file data.tf
-# get EKS cluster info to configure Kubernetes and Helm providers
+# Get EKS cluster info to configure Kubernetes and Helm providers
 ```
 data "aws_eks_cluster" "cluster" {
   name = module.eks_cluster.cluster_id
