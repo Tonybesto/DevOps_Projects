@@ -349,3 +349,57 @@ provider "kubernetes" {
   token                  = data.aws_eks_cluster_auth.cluster.token
 }
 ```
+
+### Run the init and plan again – This time you will see
+
+```
+  # module.eks-cluster.kubernetes_config_map.aws_auth[0] will be created
+  + resource "kubernetes_config_map" "aws_auth" {
+      + data = {
+          + "mapAccounts" = jsonencode([])
+          + "mapRoles"    = <<-EOT
+                - "groups":
+                  - "system:bootstrappers"
+                  - "system:nodes"
+                  "rolearn": "arn:aws:iam::696742900004:role/tooling-app-eks20210718113602300300000009"
+                  "username": "system:node:{{EC2PrivateDNSName}}"
+            EOT
+          + "mapUsers"    = <<-EOT
+                - "groups":
+                  - "system:masters"
+                  "userarn": "arn:aws:iam::696742900004:user/dare"
+                  "username": "dare"
+                - "groups":
+                  - "system:masters"
+                  "userarn": "arn:aws:iam::696742900004:user/solomon"
+                  "username": "solomon"
+                - "groups":
+                  - "darey-io-eks-developers"
+                  "userarn": "arn:aws:iam::696742900004:user/leke"
+                  "username": "leke"
+                - "groups":
+                  - "darey-io-eks-developers"
+                  "userarn": "arn:aws:iam::696742900004:user/david"
+                  "username": "david"
+            EOT
+        }
+      + id   = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/managed-by" = "Terraform"
+              + "terraform.io/module"          = "terraform-aws-modules.eks.aws"
+            }
+          + name             = "aws-auth"
+          + namespace        = "kube-system"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+    }
+
+Plan: 1 to add, 0 to change, 0 to destroy.
+```
+### Create kubeconfig file using awscli.
+
+aws eks update-kubeconfig --name <cluster_name> --region <cluster_region> --kubeconfig kubeconfig
