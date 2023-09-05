@@ -403,3 +403,66 @@ Plan: 1 to add, 0 to change, 0 to destroy.
 ### Create kubeconfig file using awscli.
 
 aws eks update-kubeconfig --name <cluster_name> --region <cluster_region> --kubeconfig kubeconfig
+
+
+
+
+
+
+
+TASK 
+
+
+helm Prometheus installation  
+
+Get Repository Info
+
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+
+
+Install Chart
+Starting with version 16.0, the Prometheus chart requires Helm 3.7+ in order to install successfully. Please check your helm release before installation.
+
+helm install prometheus prometheus-community/prometheus
+
+helm uninstall prometheus
+
+Grafana installation
+
+helm repo add grafana https://grafana.github.io/helm-charts
+
+helm repo update
+
+helm install grafana grafana/grafana
+
+
+```
+NAME: grafana
+LAST DEPLOYED: Tue Sep  5 22:22:06 2023
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+NOTES:
+1. Get your 'admin' user password by running:
+
+   kubectl get secret --namespace default grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+
+
+2. The Grafana server can be accessed via port 80 on the following DNS name from within your cluster:
+
+   grafana.default.svc.cluster.local
+
+   Get the Grafana URL to visit by running these commands in the same shell:
+     export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=grafana,app.kubernetes.io/instance=grafana" -o jsonpath="{.items[0].metadata.name}")
+     kubectl --namespace default port-forward $POD_NAME 3000
+
+3. Login with the password from step 1 and the username: admin
+#################################################################################
+######   WARNING: Persistence is disabled!!! You will lose your data when   #####
+######            the Grafana pod is terminated.                            #####
+#################################################################################
+```
+
+
