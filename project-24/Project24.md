@@ -402,7 +402,88 @@ Plan: 1 to add, 0 to change, 0 to destroy.
 ```
 ### Create kubeconfig file using awscli.
 
+```
 aws eks update-kubeconfig --name <cluster_name> --region <cluster_region> --kubeconfig kubeconfig
+```
+
+
+
+
+### Deploy Jenkins with Helm
+
+Before we begin to develop our own helm charts, lets make use of publicly available charts to deploy all the tools that we need.
+
+One of the amazing things about helm is the fact that you can deploy applications that are already packaged from a public helm repository directly with very minimal configuration. An example is **Jenkins**.
+
+1. Visit [Artifact Hub](https://artifacthub.io/packages/search) to find packaged applications as Helm Charts
+2. Search for `Jenkins`
+3. Add the repository to helm so that you can easily download and deploy
+```
+helm repo add jenkins https://charts.jenkins.io
+```
+![Alt text](<Images/helm add jenkins repo.PNG>)
+
+4. Update helm repo
+```
+helm repo update 
+```
+![Alt text](<Images/helm repo update.PNG>)
+
+
+5. Install the chart 
+```
+helm install jenkins jenkins/jenkins
+```
+![Alt text](<Images/helm install jenkins.PNG>)
+
+You should see an output like this 
+
+```
+NAME: jenkins
+LAST DEPLOYED: Tue Sep  5 12:38:53 2023
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+NOTES:
+1. Get your 'admin' user password by running:
+  kubectl exec --namespace default -it svc/jenkins -c jenkins -- /bin/cat /run/secrets/chart-admin-password && echo
+2. Get the Jenkins URL to visit by running these commands in the same shell:
+  echo http://127.0.0.1:8080
+  kubectl --namespace default port-forward svc/jenkins 8080:8080
+
+3. Login with the password from step 1 and the username: admin
+4. Configure security realm and authorization strategy
+5. Use Jenkins Configuration as Code by specifying configScripts in your values.yaml file, see documentation: http:///configuration-as-code and examples: https://github.com/jenkinsci/configuration-as-code-plugin/tree/master/demos
+
+For more information on running Jenkins on Kubernetes, visit:
+https://cloud.google.com/solutions/jenkins-on-container-engine
+
+For more information about Jenkins Configuration as Code, visit:
+https://jenkins.io/projects/jcasc/
+
+
+NOTE: Consider using a custom image with pre-installed plugins
+```
+
+6. Check the Helm deployment
+
+```
+helm ls 
+```
+![Alt text](<Images/helm ls.png>)
+
+7. Check the pods
+
+```
+kubectl get pods 
+```
+![Alt text](<Images/kubectl get pods.png>)
+
+8. Describe the running pod (review the output and try to understand what you see)
+```
+kubectl describe pod jenkins-0 
+```
+![Alt text](<Images/kubectl describe jenkins-0.png>)
 
 
 
