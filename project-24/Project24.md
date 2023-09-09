@@ -518,6 +518,7 @@ helm repo update
 
 helm install grafana grafana/grafana
 
+![Alt text](<Images/grafana install.png>)
 
 ```
 NAME: grafana
@@ -545,5 +546,8 @@ NOTES:
 ######            the Grafana pod is terminated.                            #####
 #################################################################################
 ```
+![Alt text](<Images/grafana login page.png>)
 
+
+![Alt text](<Images/grafana homepage.png>)
 
