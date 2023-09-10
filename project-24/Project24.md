@@ -485,9 +485,9 @@ kubectl describe pod jenkins-0
 ```
 ![Alt text](<Images/kubectl describe jenkins-0.png>)
 
+![Alt text](<Images/jenkins login page.png>)
 
-
-
+![Alt text](<Images/jenkins logged in.png>)
 
 
 
@@ -513,6 +513,8 @@ helm uninstall prometheus
 Grafana installation
 
 helm repo add grafana https://grafana.github.io/helm-charts
+
+![Alt text](<Images/add grafana repo.png>)
 
 helm repo update
 
