@@ -494,23 +494,38 @@ kubectl describe pod jenkins-0
 TASK 
 
 
-helm Prometheus installation  
+### Prometheus installation  
 
 Get Repository Info
 
+```
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo update
+```
 
+
+```
+helm repo update
+```
 
 
 Install Chart
+
 Starting with version 16.0, the Prometheus chart requires Helm 3.7+ in order to install successfully. Please check your helm release before installation.
 
+```
 helm install prometheus prometheus-community/prometheus
+```
+![Alt text](<Images/install prometheus.png>)
 
-helm uninstall prometheus
 
-Grafana installation
+![Alt text](<Images/Prometheus pods running.png>)
+
+
+![Alt text](<Images/homepage Prometheus.png>)
+
+
+
+### Grafana installation
 
 helm repo add grafana https://grafana.github.io/helm-charts
 
